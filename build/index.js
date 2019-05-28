@@ -9,7 +9,7 @@ var TimerFormat;
     TimerFormat["day"] = "d";
 })(TimerFormat || (TimerFormat = {}));
 class Timer {
-    constructor(time = Date.now(), format = TimerFormat.millisecond) {
+    constructor(time = Date.now(), format) {
         this.time = time;
         this.format = format;
     }
@@ -20,7 +20,7 @@ class Timer {
         return this.numberFormat(this.since_pause);
     }
     numberFormat(time) {
-        switch (this._format) {
+        switch (this._format ? this._format : Timer._default_format) {
             case TimerFormat.second:
                 return time / 1000;
             case TimerFormat.minute:
@@ -49,12 +49,26 @@ class Timer {
         return typeof this.at_pause !== "undefined";
     }
     set format(v) {
-        if (Object.values(TimerFormat).includes(v)) {
+        if (!v) {
+            this._format = undefined;
+        }
+        else if (Object.values(TimerFormat).includes(v)) {
             this._format = v;
         }
         else {
             throw new TypeError("Format does not exists");
         }
+    }
+    static set default_format(v) {
+        if (Object.values(TimerFormat).includes(v)) {
+            Timer.default_format = v;
+        }
+        else {
+            throw new TypeError("Format does not exists");
+        }
+    }
+    static get default_format() {
+        return Timer._default_format;
     }
     get format() {
         return this._format;
@@ -63,19 +77,32 @@ class Timer {
         this.time = Date.now();
         this.at_pause = undefined;
     }
-    pause() {
+    pause(ms) {
         if (!this.paused) {
             this.at_pause = Date.now();
+            if (ms) {
+                this.timeout_id = setTimeout(() => {
+                    this.start();
+                }, ms);
+            }
         }
     }
     start() {
         if (this.paused) {
             this.time += this.since_pause;
             this.at_pause = undefined;
+            if (this.timeout_id) {
+                clearTimeout(this.timeout_id);
+                this.timeout_id = undefined;
+            }
         }
         else {
             this.reset();
         }
     }
+    get [Symbol.toStringTag]() {
+        return "Timerize";
+    }
 }
+Timer._default_format = TimerFormat.millisecond;
 exports.default = Timer;
