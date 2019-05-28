@@ -9,14 +9,29 @@ export default class Timer {
 
     protected static _default_format = TimerFormat.millisecond;
 
+    /**
+     * Create a new instance of Timerize.
+     * Constructing the object will start the timer automatically.
+     * 
+     * @param time Time where the timer should start. **DON'T** change it unless you know what you're doing!
+     * @param format An accepted time format (ms, s, m, h or d).
+     */
     constructor(protected time = Date.now(), format?: TimerFormat) {
         this.format = format;
     }
 
+    /**
+     * The elapsed time since the start of the timer.
+     */
     get elapsed() {
         return this.numberFormat(this.getRealTime());
     }
 
+    /**
+     * The elapsed time since the call to `pause()`.
+     * 
+     * If the timer is started, could return `NaN` or `undefined`.
+     */
     get elapsedSincePause() {
         return this.numberFormat(this.since_pause);
     }
@@ -50,10 +65,18 @@ export default class Timer {
         return Date.now() - this.at_pause;
     }
 
+    /**
+     * Check if the timer is paused.
+     */
     get paused() {
         return typeof this.at_pause !== "undefined";
     }
 
+    /**
+     * Change the format of the timer.
+     * 
+     * Can be ms, s, m, h or d.
+     */
     set format(v: string) {
         if (!v) {
             this._format = undefined;
@@ -66,6 +89,11 @@ export default class Timer {
         }
     }
 
+    /**
+     * Change the default format applied to new instances and instances that don't have explicitly changed format.
+     * 
+     * See format()
+     */
     static set default_format(v: string) {
         if (Object.values(TimerFormat).includes(v)) {
             Timer.default_format = v as TimerFormat;
@@ -75,19 +103,32 @@ export default class Timer {
         }
     }
 
+    /**
+     * Current default format.
+     */
     static get default_format() {
         return Timer._default_format;
     }
 
+    /**
+     * Current time output format.
+     */
     get format() {
         return this._format;
     }
 
-    reset() {
-        this.time = Date.now();
+    /**
+     * Reset the timer to now().
+     */
+    reset(now = Date.now()) {
+        this.time = now;
         this.at_pause = undefined;
     }
 
+    /**
+     * Pause the current timer.
+     * @param ms (optional): Automatically restart the timer after `ms` milliseconds.
+     */
     pause(ms?: number) {
         if (!this.paused) {
             this.at_pause = Date.now();
@@ -100,6 +141,11 @@ export default class Timer {
         }
     }
 
+    /**
+     * Start the timer after a pause.
+     * 
+     * You **don't** need to call `start()` just after instanciation.
+     */
     start() {
         if (this.paused) {
             this.time += this.since_pause;

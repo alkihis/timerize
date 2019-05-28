@@ -64,6 +64,7 @@ const elapsed_time = timer.elapsed;
 ### format
 
 Change the elapsed time format output.
+**Default format is `ms`**.
 
 Accepted formats are `ms`, `s`, `m`, `h` and `d`, for milliseconds, seconds, minutes, hours and days.
 
