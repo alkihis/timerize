@@ -96,7 +96,7 @@ export default class Timer {
      */
     static set default_format(v: string) {
         if (Object.values(TimerFormat).includes(v)) {
-            Timer.default_format = v as TimerFormat;
+            Timer._default_format = v as TimerFormat;
         }
         else {
             throw new TypeError("Format does not exists");
